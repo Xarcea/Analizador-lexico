@@ -1,5 +1,4 @@
-
-package com.mycompany.interprete;
+package mx.ipn.interprete;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -15,12 +14,12 @@ import java.util.List;
  */
 public class Interprete {
 
-        //static boolean existenErrores = false;
+    //static boolean existenErrores = false;
+    private static int linea = 1;
 
     public static void main(String[] args) throws IOException {
         if(args.length > 1) {
             System.out.println("Uso correcto: interprete [script]");
-
             // Convención defininida en el archivo "system.h" de UNIX
             System.exit(64);
         } else if(args.length == 1){
@@ -42,11 +41,12 @@ public class Interprete {
         InputStreamReader input = new InputStreamReader(System.in);
         BufferedReader reader = new BufferedReader(input);
 
-        for(;;){
+        while(true){
             System.out.print(">>> ");
-            String linea = reader.readLine();
-            if(linea == null) break; // Presionar Ctrl + D
-            ejecutar(linea);
+            String inline = reader.readLine();
+            if(inline == null) break; // Presionar Ctrl + C
+            ejecutar(inline);
+            linea++;
             //existenErrores = false;
         }
     }
@@ -60,21 +60,18 @@ public class Interprete {
         }
     }
 
-    /*
-    El método error se puede usar desde las distintas clases
-    para reportar los errores:
-    Interprete.error(....);
-     */
-
-    static void error(int linea, String mensaje){
-        reportar(linea, "", mensaje);
+    static void error(String mensaje){
+        reportar(linea, mensaje);
     }
 
-    private static void reportar(int linea, String donde, String mensaje){
+    static void error(int linea, String mensaje){
+        reportar(linea, mensaje);
+    }
+
+    private static void reportar(int linea, String mensaje){
         System.err.println(
-                "[linea " + linea + "] Error " + donde + ": " + mensaje
+                "[linea " + linea + "] Error: " + mensaje
         );
         //existenErrores = true;
-        System.exit(65);
     }
 }

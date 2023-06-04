@@ -1,5 +1,4 @@
-
-package com.mycompany.interprete;
+package mx.ipn.interprete;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -67,73 +66,74 @@ public class Scanner {
     }
     
     private void generarToken(TipoToken tipo, String lexema, Object literal,
-            int linea){
-        tokens.add(new Token(tipo,lexema,literal,linea));
+            int posicion){
+        tokens.add(new Token(tipo,lexema,literal,posicion));
     }
     
-    private String ponerCaracterFin(){
-        return source + ' ';
-    }
+    //private String ponerCaracterFin(){
+    //    return source + ' ';
+    //}
 
     List<Token> scanTokens(){
-        int est=0;
-        int inicio=0;
-        int avance=0;
+        int est=0,inicio=0,avance=0,j=1;
         char c;
-        String lexema,s;
-        String fuente = ponerCaracterFin();
+        String lexema,literal;
+        String fuente = source + ' ';//ponerCaracterFin();
         TipoToken tipo;
-        Object literal;
         
         for (int i=0; i<fuente.length();) {
-            c=fuente.charAt(i);
-            s = String.valueOf(c);
+            c = fuente.charAt(i);
+            //s = String.valueOf(c);
             switch (est){
                 case 0:
-                    if(s.matches("[a-zA-Z_]")){
-                        est=10; avance=++i;
+                    if(c=='_' || Character.isAlphabetic(c)){
+                        est=10; avance=++i; j++;
                     }
-                    else if (s.matches("[0-9]")){
-                        est=11; avance=++i;
+                    else if (Character.isDigit(c)){
+                        est=11; avance=++i; j++;
                     }
                     else{
                         switch (c) {
                             case '<':
-                                est=1; avance=++i;
+                                est=1; avance=++i; j++;
                                 break;
                             case '=':
-                                est=2; avance=++i;
+                                est=2; avance=++i; j++;
                                 break;
                             case '>':
-                                est=3; avance=++i;
+                                est=3; avance=++i; j++;
                                 break;
                             case '(': case ')': case '{': case '}': case ',':
                             case '.': case ';': case '-': case '+': case '*':
-                                est=20; avance=++i;
+                                est=20; avance=++i; j++;
                                 break;
                             case '/':
-                                est=4; avance=++i;
+                                est=4; avance=++i; j++;
                                 break;
                             case '"':
-                                est=8; avance=++i;
+                                est=8; avance=++i; j++;
                                 break;
                             case '!':
-                                est=9; avance=++i;
+                                est=9; avance=++i; j++;
                                 break;
                             case ' ': case '\t': case '\n': case '\r':
-                                if(c=='\r')
-                                    linea++;
-                                est=17; i++;
+                                if(c=='\r'){
+                                    linea++; j=1;
+                                }
+                                est=17; i++; j++;
                                 break;
                             default:
-                                est=24;
+                                Interprete.error(linea, "Error en la posición " + j 
+                                + ". Símbolo no válido.");
+                                inicio=avance=++i;
+                                est=0; j++;
                                 break;
                         }
                     }
                     break;
                 case 1: case 2: case 3:
                     if(c=='='){
-                        est=20; avance=++i;
+                        est=20; avance=++i; j++;
                     }
                     else{
                         est=20;
@@ -141,10 +141,10 @@ public class Scanner {
                     break;
                 case 4:
                     if(c=='/'){
-                        est=5; avance=++i;
+                        est=5; avance=++i; j++;
                     }
                     else if(c=='*'){
-                        est=6; avance=++i;
+                        est=6; avance=++i; j++;
                     }
                     else{
                         est=20;
@@ -152,86 +152,98 @@ public class Scanner {
                     break;
                 case 5:
                     if(c=='\n'){
-                        est=0; inicio=avance=++i;
+                        est=0; inicio=avance=++i; j++;
                     }
                     else{
-                        est=5; i++;
+                        est=5; i++; j++;
                     }
                     break;
                 case 6:
                     if(i==source.length()){
-                        est=24; break;
+                        Interprete.error(linea, "Error en la posición " + j 
+                                + ". Se esperaba fin de comentario.");
+                        i++; break;
                     }
                     if(c=='*')
                         est=7;
                     else
                         est=6;
-                    avance=++i;
+                    avance=++i; j++;
                     break;
                 case 7:
                     if(i==source.length()){
-                        est=24; break;
+                        Interprete.error(linea, "Error en la posición " + j 
+                                + ". Se esperaba / .");
+                        i++; break;
                     }
                     if(c=='/'){
-                        est=0; inicio=avance=++i;
+                        est=0; inicio=avance=++i; j++;
                     }
                     else{
-                        est=6; i++;
+                        est=6; i++; j++;
                     }
                     break;
                 case 8:
                     if(i==source.length()){
-                        est=24; break;
+                        Interprete.error(linea, "Error en la posición " + j 
+                                + ". Se esperaba \" ."); 
+                        i++; break;
                     }
                     if(c=='"')
                         est=22;
                     else
                         est=8;
-                    avance=++i;
+                    avance=++i; j++;
                     break;
                 case 9:
                     if(c=='='){
-                        est=20; avance=++i;
+                        est=20; avance=++i; j++;
                     }
                     else{
                         est=20;
                     }
                     break;
                 case 10:
-                    if(s.matches("[a-zA-Z_0-9]")){
-                        est=10; avance=++i;
+                    if(c=='_' || Character.isAlphabetic(c) || Character.isDigit(c)){
+                        est=10; avance=++i; j++;
                     }
                     else{
                         est=21;
                     }
                     break;
                 case 11:
-                    if (s.matches("[0-9]")){
-                        est=11; avance=++i;
+                    if(Character.isDigit(c)){
+                        est=11; avance=++i; j++;
                     }
                     else if(c=='.'){
-                        est=12; avance=++i;
+                        est=12; avance=++i; j++;
                     }
                     else if(c=='E'){
-                        est=14; avance=++i;
+                        est=14; avance=++i; j++;
                     }
                     else{
                         est=23;
                     }
                     break;
                 case 12:
-                    if(s.matches("[0-9]")){
-                        est=13; avance=++i;
+                    if(Character.isDigit(c)){
+                        est=13; avance=++i; j++;
                     }
-                    else
-                        est=24;
+                    else{
+                        Interprete.error(linea, "Error en la posición " + j 
+                                + ". Se esperaba un dígito.");
+                        lexema = fuente.substring(inicio,avance-1);
+                        double num = Double.parseDouble((String) lexema);
+                        generarToken(TipoToken.NUM,lexema,num,inicio);
+                        est=0; inicio=avance=--i; j--;
+                    }
                     break;
                 case 13:
-                    if(s.matches("[0-9]")){
-                        est=13; avance=++i;
+                    if(Character.isDigit(c)){
+                        est=13; avance=++i; j++;
                     }
                     else if(c=='E'){
-                        est=14; avance=++i;
+                        est=14; avance=++i; j++;
                     }
                     else{
                         est=23;
@@ -239,34 +251,46 @@ public class Scanner {
                     break;
                 case 14:
                     if(c=='+'||c=='-'){
-                        est=15; avance=++i;
+                        est=15; avance=++i; j++;
                     }
-                    else if(s.matches("[0-9]")){
-                        est=16; avance=++i;
-                    }
-                    else
-                        est=24;
-                    break;
-                case 15:
-                    if(s.matches("[0-9]")){
-                        est=16; avance=++i;
-                    }
-                    else
-                        est=24;
-                    break;
-                case 16:
-                    if(s.matches("[0-9]")){
-                        est=16; avance=++i;
+                    else if(Character.isDigit(c)){
+                        est=16; avance=++i; j++;
                     }
                     else{
-                        est=23;
+                        Interprete.error(linea, "Error en la posición " + j 
+                                + ". Se esperaba un dígito, + o - .");
+                        lexema = fuente.substring(inicio,avance-1);
+                        double num = Double.parseDouble((String) lexema);
+                        generarToken(TipoToken.NUM,lexema,num,inicio);
+                        est=0; inicio=avance=--i; j--;
                     }
+                    break;
+                case 15:
+                    if(Character.isDigit(c)){
+                        est=16; avance=++i; j++;
+                    }
+                    else{
+                        Interprete.error(linea, "Error en la posición " + j 
+                                + ". Se esperaba un dígito.");
+                        lexema = fuente.substring(inicio,avance-2);
+                        double num = Double.parseDouble((String) lexema);
+                        generarToken(TipoToken.NUM,lexema,num,inicio);
+                        est=0; i-=2; inicio=avance=i; j-=2;
+                    }
+                    break;
+                case 16:
+                    if(Character.isDigit(c)){
+                        est=16; avance=++i; j++;
+                    }
+                    else
+                        est=23;
                     break;
                 case 17:
                     if(c==' '||c=='\t'||c=='\n'||c=='\r'){
-                        if(c=='\r')
-                            linea++;
-                        est=17; i++;
+                        if(c=='\r'){
+                            linea++; j=1;
+                        }
+                        est=17; i++; j++;
                     }
                     else{
                         est=0; inicio=avance=i;
@@ -275,35 +299,32 @@ public class Scanner {
                 case 20:
                     lexema = fuente.substring(inicio, avance);
                     tipo = simbolos.get(lexema);
-                    generarToken(tipo,lexema,null,linea);
+                    generarToken(tipo,lexema,null,inicio);
                     est=0; inicio=avance=i;
                     break;
                 case 21:
                     lexema = fuente.substring(inicio,avance);
                     tipo = palabrasReservadas.getOrDefault(lexema, 
                             TipoToken.ID);
-                    generarToken(tipo,lexema,null,linea);
+                    generarToken(tipo,lexema,null,inicio);
                     est=0; inicio=avance=i;
                     break;
                 case 22:
-                    lexema = fuente.substring(inicio,avance);
-                    inicio++; avance--;
-                    literal = fuente.substring(inicio, avance);
-                    generarToken(TipoToken.CADENA,lexema,literal,linea);
+                    lexema = fuente.substring(inicio, avance);
+                    //inicio++; avance--;
+                    literal = fuente.substring(inicio+1, avance-1);
+                    generarToken(TipoToken.CADENA,lexema,literal,inicio);
                     est=0; inicio=avance=i;
                     break;
                 case 23:
                     lexema = fuente.substring(inicio,avance);
                     double num = Double.parseDouble((String) lexema);
-                    generarToken(TipoToken.NUM,lexema,num,linea);
+                    generarToken(TipoToken.NUM,lexema,num,inicio);
                     est=0; inicio=avance=i;
-                    break;
-                case 24:
-                    Interprete.error(linea, "Caracter: " + i + ": " + c);
                     break;
             }
         }
-        generarToken(TipoToken.EOF,"",null,linea);
+        generarToken(TipoToken.EOF,"",null,source.length());
         return tokens;
     }
 }

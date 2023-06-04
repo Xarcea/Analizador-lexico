@@ -1,5 +1,4 @@
-
-package com.mycompany.interprete;
+package mx.ipn.interprete;
 
 /**
  *
@@ -9,13 +8,13 @@ public class Token {
     final TipoToken tipo;
     final String lexema;
     final Object literal;
-    final int linea;
+    final int posicion;
 
-    public Token(TipoToken tipo, String lexema, Object literal, int linea) {
+    public Token(TipoToken tipo, String lexema, Object literal, int posicion) {
         this.tipo = tipo;
         this.lexema = lexema;
         this.literal = literal;
-        this.linea = linea;
+        this.posicion = posicion;
     }
 
     @Override
