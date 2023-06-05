@@ -9,12 +9,15 @@ public class Token {
     final String lexema;
     final Object literal;
     final int posicion;
+    final int linea;
 
-    public Token(TipoToken tipo, String lexema, Object literal, int posicion) {
+    public Token(TipoToken tipo, String lexema, Object literal, 
+                 int posicion, int linea) {
         this.tipo = tipo;
         this.lexema = lexema;
         this.literal = literal;
         this.posicion = posicion;
+        this.linea = linea;
     }
 
     @Override

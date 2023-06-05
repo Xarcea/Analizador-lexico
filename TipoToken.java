@@ -12,8 +12,8 @@ public enum TipoToken {
     //Identificador, cadena y número
     ID, CADENA, NUM,
     // Palabras clave
-    Y, CLASE, ADEMAS, FALSO, PARA, FUN, SI, NULO, O, IMPRIMIR, RETORNAR,
-    SUPER, ESTE, VERDADERO, VAR, MIENTRAS,
+    AND, CLASS, ELSE, FALSE, FOR, FUN, IF, NULL, OR, PRINT, RETURN,
+    SUPER, THIS, TRUE, VAR, WHILE,
     // Signos
     PAR_AP, PAR_CIE, LLAVE_AP, LLAVE_CIE, COMA, PUNTO, PUNT_COMA, MENOS, MAS,
     MULT, NO, DIFERENCIA, ASIG, IGUAL, LT, LE, GT, GE, DIV, 

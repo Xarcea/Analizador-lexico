@@ -12,10 +12,8 @@ import java.util.List;
  *
  * @author xavier arce
  */
-public class Interprete {
 
-    //static boolean existenErrores = false;
-    private static int linea = 1;
+public class Interprete {
 
     public static void main(String[] args) throws IOException {
         if(args.length > 1) {
@@ -32,9 +30,6 @@ public class Interprete {
     private static void ejecutarArchivo(String path) throws IOException {
         byte[] bytes = Files.readAllBytes(Paths.get(path));
         ejecutar(new String(bytes, Charset.defaultCharset()));
-
-        // Se indica que existe un error
-        //if(existenErrores) System.exit(65);
     }
 
     private static void ejecutarPrompt() throws IOException{
@@ -46,8 +41,6 @@ public class Interprete {
             String inline = reader.readLine();
             if(inline == null) break; // Presionar Ctrl + C
             ejecutar(inline);
-            linea++;
-            //existenErrores = false;
         }
     }
 
@@ -55,13 +48,12 @@ public class Interprete {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
-        for(Token token : tokens){
+        /*for(Token token : tokens){
             System.out.println(token);
-        }
-    }
+        }*/
 
-    static void error(String mensaje){
-        reportar(linea, mensaje);
+        Parser parser = new Parser(tokens);
+        parser.analizar();
     }
 
     static void error(int linea, String mensaje){
@@ -72,6 +64,5 @@ public class Interprete {
         System.err.println(
                 "[linea " + linea + "] Error: " + mensaje
         );
-        //existenErrores = true;
     }
 }
