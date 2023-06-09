@@ -148,7 +148,9 @@ public class Scanner {
                     break;
                 case 5:
                     if(c=='\n'){
-                        est=0; inicio=avance=++i; av=pos=1;
+                        linea++; est=0;
+                        inicio=avance=++i;
+                        av=pos=1;
                     }
                     else{
                         est=5; i++; av++;
