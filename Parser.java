@@ -36,7 +36,7 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    public void analizar(){
+    public boolean analizar(){
         primeroExpression.addAll(primeroPrimary);
         primeroStatement.addAll(primeroExpression);
         primeroDeclaration.addAll(primeroStatement);
@@ -49,8 +49,10 @@ public class Parser {
             );
         }
         else if(!hayErrores && preanalisis.tipo.equals(TipoToken.EOF)){
-            System.out.println("Cadena válida");
+            //System.out.println("Cadena válida");
+            return true;
         }
+        return false;
     }
 
     void PROGRAM(){

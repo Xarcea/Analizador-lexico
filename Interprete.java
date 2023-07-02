@@ -14,6 +14,7 @@ import java.util.List;
  */
 
 public class Interprete {
+    private static TablaSimbolos tabla = new TablaSimbolos();
 
     public static void main(String[] args) throws IOException {
         if(args.length > 1) {
@@ -48,12 +49,28 @@ public class Interprete {
         Scanner scanner = new Scanner(source);
         List<Token> tokens = scanner.scanTokens();
 
-        /*for(Token token : tokens){
+        /*System.out.println("--------------Infija------------");
+
+        for(Token token : tokens){
             System.out.println(token);
         }*/
 
         Parser parser = new Parser(tokens);
-        parser.analizar();
+        if(!parser.analizar())
+            System.exit(64);
+
+        GeneradorPostfija gpf = new GeneradorPostfija(tokens);
+        List<Token> postfija = gpf.convertir();
+
+        /*System.out.println("--------------Postfija------------");
+
+        for(Token token : postfija){
+            System.out.println(token);
+        }*/
+
+        GeneradorAST gast = new GeneradorAST(postfija);
+        Arbol programa = gast.generarAST();
+        programa.recorrer(tabla);
     }
 
     static void error(int linea, String mensaje){
