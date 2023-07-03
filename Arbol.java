@@ -23,8 +23,7 @@ public class Arbol {
             case MENOS:
             case MULT:
             case DIV:
-                Object res = realizarOperacion(n);
-                //System.out.println(res);
+                realizarOperacion(n);
             break;
             case ASIG:
                 Nodo temp = n.getHijos().get(0);
@@ -45,16 +44,18 @@ public class Arbol {
                 Nodo posibleELSE = n.getHijos().get(size-1);
                 if(condIF instanceof Boolean){
                     if((boolean) condIF){
-                        for(int i=1; i<n.getHijos().size(); i++){
-                            Nodo m = n.getHijos().get(i);
-                            if(m.getValue().tipo == TipoToken.ELSE)
-                                break;
-                            recorrer(m);
-                        }
+                        if(n.getHijos() != null)
+                            for(int i=1; i<n.getHijos().size(); i++){
+                                Nodo m = n.getHijos().get(i);
+                                if(m.getValue().tipo == TipoToken.ELSE)
+                                    break;
+                                recorrer(m);
+                            }
                     } else if(posibleELSE.getValue().tipo == TipoToken.ELSE){
-                        for(Nodo m : posibleELSE.getHijos()){
-                            recorrer(m);
-                        }
+                        if(posibleELSE.getHijos() != null)
+                            for(Nodo m : posibleELSE.getHijos()){
+                                    recorrer(m);
+                            }
                     }
                 } else{
                     Interprete.error(n.getValue().linea, "Error en la posición " + n.getValue().posicion + 
@@ -67,10 +68,11 @@ public class Arbol {
                 Object condFOR = realizarOperacion(n.getHijos().get(1));
                 if(condFOR instanceof Boolean){
                     while((boolean) condFOR){
-                        for(int i=3; i<n.getHijos().size(); i++){
-                            Nodo m = n.getHijos().get(i);
-                            recorrer(m);
-                        }
+                        if(n.getHijos() != null)
+                            for(int i=3; i<n.getHijos().size(); i++){
+                                Nodo m = n.getHijos().get(i);
+                                recorrer(m);
+                            }
                         recorrer(n.getHijos().get(2));
                         condFOR = realizarOperacion(n.getHijos().get(1));
                     }
@@ -84,10 +86,11 @@ public class Arbol {
                 Object condWHILE = realizarOperacion(n.getHijos().get(0));
                 if(condWHILE instanceof Boolean){
                     while((boolean) condWHILE){
-                        for(int i=1; i<n.getHijos().size(); i++){
-                            Nodo m = n.getHijos().get(i);
-                            recorrer(m);
-                        }
+                        if(n.getHijos() != null)
+                            for(int i=1; i<n.getHijos().size(); i++){
+                                Nodo m = n.getHijos().get(i);
+                                recorrer(m);
+                            }
                         condWHILE = realizarOperacion(n.getHijos().get(0));
                     }
                 } else{
@@ -119,12 +122,16 @@ public class Arbol {
             ". Variable duplicada.");
             System.exit(64);
         }
-        Nodo der = n.getHijos().get(1);
         Object valor;
-        if(der.getValue().esOperador()){
-            valor = realizarOperacion(der);
-        } else{
-            valor = der.getValue().literal;
+        if(n.getHijos().size() == 1){
+            valor = null;
+        } else {
+            Nodo der = n.getHijos().get(1);
+            if(der.getValue().esOperador()){
+                valor = realizarOperacion(der);
+            } else{
+                valor = der.getValue().literal;
+            }
         }
         tabla.asignar(izq.getValue().lexema, valor);
     }
